@@ -1,0 +1,38 @@
+name: module3_task1
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *"
+jobs:
+  Build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Setup
+        run: |
+          cd module3_task1
+          ./setup.sh
+      - name: Lint
+        run: |
+          cd module3_task1
+          make lint
+      - name: Build
+        run: |
+          cd module3_task1
+          make build
+      - name: Unit Tests
+        run: |
+          cd module3_task1
+          make unit-tests
+      - name: Integration Tests
+        run: |
+          cd module3_task1
+          make integration-tests
+      - name: Validate
+        run: |
+          cd module3_task1
+          make validate
+  

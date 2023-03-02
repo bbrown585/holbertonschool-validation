@@ -1,0 +1,72 @@
+name: module3_task3
+on:
+  push:
+    tags:
+      - 1.0.*
+    branches:
+      - main
+  pull_request:
+    types: [opened, reopened]
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  Build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Setup
+        run: |
+          cd module3_task3
+          ./setup.sh
+      - name: Lint
+        run: |
+          cd module3_task3
+          make lint
+      - name: Build
+        run: |
+          cd module3_task3
+          make build
+      - name: Unit Tests
+        run: |
+          cd module3_task3
+          make unit-tests
+      - name: Integration Tests
+        run: |
+          cd module3_task3
+          make integration-tests
+      - name: Validate
+        run: |
+          cd module3_task3
+          make validate
+      - name: Package
+        run: |
+          cd module3_task3
+          make package
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: awesomeWebsiteZip
+          path: module3_task3/awesome-website.zip
+  Release:
+    needs: Build
+    runs-on: ubuntu-20.04
+    if: startsWith(github.ref, 'refs/tags/1.0.')
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Download artifacts from Build
+        uses: actions/download-artifact@v3
+        with:
+          name: awesomeWebsiteZip
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: awesome-website.zip
+          body_path: module3_task3/DEPLOY.md
+      - name: release drafter
+        uses: release-drafter/release-drafter@v5
