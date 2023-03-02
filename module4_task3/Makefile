@@ -40,7 +40,7 @@ clean: ## Delete the dist/ directory
 	rm -f ./awesome.tar.zip
 	rm -f ./awesome-api.log
 
-post: ## Create a new post
+post: ## Create a new post NOW
 	echo '---' >> ./content/posts/$(POST_NAME).md
 	echo "title: $(POST_TITLE)" >> ./content/posts/$(POST_NAME).md
 	echo '---' >> ./content/posts/$(POST_NAME).md
