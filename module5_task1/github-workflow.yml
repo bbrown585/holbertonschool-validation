@@ -39,7 +39,7 @@ jobs:
           make unit-tests
       - name: Integration Tests
         run: |
-          cd module4_task3
+          cd module5_task1
           make integration-tests
       - name: Validate
         run: |
@@ -47,17 +47,17 @@ jobs:
           make validate
       - name: Package
         run: |
-          cd module4_task3
+          cd module5_task1
           make package
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: awesomeWebsiteZip
-          path: module4_task1/awesome-website.zip
+          path: module5_task1/awesome-website.zip
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
         with:
-          publish-dir: './module4_task1/dist'
+          publish-dir: './module5_task1/dist'
           production-branch: main
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
@@ -99,6 +99,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: awesome-website.zip
-          body_path: module4_task0/DEPLOY.md
+          body_path: module5_task1/DEPLOY.md
       - name: release drafter
         uses: release-drafter/release-drafter@v5
