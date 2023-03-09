@@ -1,16 +1,15 @@
 #!/bin/bash
 
-# Get the list of instances with a "running" status
-instances=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].{Name:PublicDnsName}" --output=text)
-
-# Check if there is at least one running instance
-if [[ -n "$instances" ]]; then
-    # If there is, print the public DNS name of the first instance found
-    echo "$instances" | head -n 1
-else
-    # If there is none, create a new instance
-    instance=$(aws ec2 run-instances --image-id ami-0c94855ba95c71c99 --count 1 --instance-type t2.micro --key-name mykey --security-group-ids sg-xxxxxxxx --subnet-id subnet-xxxxxxxx --associate-public-ip-address --query "Instances[0].{Name:PublicDnsName}" --output=text)
-
-    # Print the public DNS name of the newly created instance
-    echo "$instance"
-fi
+# Create the EC2 instance and print the public IP address
+aws ec2 run-instances \
+	--image-id ami-0568936c8d2b91c4e \
+	--instance-type t2.micro \
+	--subnet-id subnet-0a17a3ab697932061   \
+	--security-group-ids sg-0c059db4243c157f6 \
+	--key-name awesome-key \
+	--query 'Instances[*].InstanceId' \
+	--output text \
+| xargs -I {} aws ec2 describe-instances \
+	--instance-ids {} \
+	--query 'Reservations[*].Instances[*].PublicIpAddress' \
+	--output text 
