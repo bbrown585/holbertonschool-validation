@@ -1,0 +1,104 @@
+name: module5_task1
+on:
+  push:
+    tags:
+      - 1.0.*
+    branches:
+      - main
+  pull_request:
+    types: [opened, reopened]
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  Build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Setup GitHub actions image
+        run: sudo apt install -y make zip
+      - name: Build Docker image
+        run: |
+          cd module5_task1
+          make build-docker
+      - name: Lint
+        run: |
+          cd module5_task1
+          make lint
+      - name: Build
+        run: |
+          cd module5_task1
+          make build
+      - name: Unit Tests
+        run: |
+          cd module5_task1
+          make unit-tests
+      - name: Integration Tests
+        run: |
+          cd module5_task1
+          make integration-tests
+      - name: Validate
+        run: |
+          cd module5_task1
+          make validate
+      - name: Package
+        run: |
+          cd module5_task1
+          make package
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: awesomeWebsiteZip
+          path: module5_task1/awesome-website.zip
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: './module5_task1/dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 1
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.AWESOME_KEY }}
+      - name: Create & Configure EC2 Instance
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+        run: |
+          cd module5_task1
+          ./ensure-server-setup.sh "$(./ensure-server-created.sh)"
+      - name: Deploy Docker Image
+        run: |
+          cd module5_task1
+          ./deploy.sh
+  Release:
+    needs: Build
+    runs-on: ubuntu-20.04
+    if: startsWith(github.ref, 'refs/tags/1.0.')
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+      - name: Download artifacts from Build
+        uses: actions/download-artifact@v3
+        with:
+          name: awesomeWebsiteZip
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: awesome-website.zip
+          body_path: module5_task1/DEPLOY.md
+      - name: release drafter
+        uses: release-drafter/release-drafter@v5
