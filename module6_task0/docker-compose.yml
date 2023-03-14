@@ -1,0 +1,33 @@
+services:
+  awesome-build:
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile
+    image: awesome:build
+  awesome-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: bbrown585/awesome-web:${CURRENT_GIT_REF:-main}
+    restart: always
+    ports:
+      - 9999
+  awesome-static:
+    build:
+      context: .
+      dockerfile: ./docker-static/Dockerfile.static
+    image: bbrown585/awesome-static:${CURRENT_GIT_REF:-main}
+    restart: always
+    ports:
+      - 9000
+  reverse-proxy:
+    build:
+      context: .
+      dockerfile: ./docker-reverse-proxy/Dockerfile.reverse-proxy
+    image: bbrown585/reverse-proxy:${CURRENT_GIT_REF:-main}
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - awesome-api
+      - awesome-static
