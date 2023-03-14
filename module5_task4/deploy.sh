@@ -9,5 +9,7 @@ dockerImageTag=$(cat awesome_image_tag_name.txt)
 docker context create production --docker "host=ssh://ubuntu@$new_ec2_instance_public_ip"
 docker context use production
 
-docker pull bbrown585/awesome-web:"$dockerImageTag"
-docker compose up --detach awesome-web
+docker pull bbrown585/awesome-static:"$dockerImageTag"
+docker pull bbrown585/awesome-api:"$dockerImageTag"
+docker pull bbrown585/reverse-proxy:"$dockerImageTag"
+docker compose up --detach --scale awesome-api=2 reverse-proxy

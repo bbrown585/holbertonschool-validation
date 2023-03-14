@@ -1,4 +1,4 @@
-name: module5_task2
+name: module5_task4
 on:
   push:
     tags: [ "1.0.*" ]
@@ -21,31 +21,31 @@ jobs:
         run: sudo apt install -y make zip
       - name: Build Docker Image
         run: |
-          cd module5_task2
+          cd module5_task4
           make build-docker
       - name: Lint
         run: |
-          cd module5_task2
+          cd module5_task4
           make lint
       - name: Build
         run: |
-          cd module5_task2
+          cd module5_task4
           make build
       - name: Unit Tests
         run: |
-          cd module5_task2
+          cd module5_task4
           make unit-tests
       - name: Integration Tests
         run: |
-          cd module5_task2
+          cd module5_task4
           make integration-tests
       - name: Validate
         run: |
-          cd module5_task2
+          cd module5_task4
           make validate
       - name: Package
         run: |
-          cd module5_task2
+          cd module5_task4
           make package
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -54,27 +54,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Publish Image to Docker Hub
         run: |
-          cd module5_task2
+          cd module5_task4
           make publish-docker-hub
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: awesomeWebsiteZip
-          path: module5_task2/awesome-website.zip
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v2
-        with:
-          publish-dir: './module5_task2/dist'
-          production-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
-          enable-pull-request-comment: true
-          enable-commit-comment: true
-          overwrites-pull-request-comment: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        timeout-minutes: 1
       - name: Install SSH Key
         uses: webfactory/ssh-agent@v0.7.0
         with:
@@ -85,11 +66,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
         run: |
-          cd module5_task2
+          cd module5_task4
           ./ensure-server-setup.sh "$(./ensure-server-created.sh)"
       - name: Deploy Docker Image
         run: |
-          cd module5_task2
+          cd module5_task4
           ./deploy.sh
   Release:
     needs: Build

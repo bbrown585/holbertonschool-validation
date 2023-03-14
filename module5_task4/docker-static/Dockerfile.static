@@ -1,0 +1,4 @@
+FROM nginx
+
+COPY ./dist /var/www/html/dist
+COPY ./docker-static/awesome-static.conf /etc/nginx/conf.d/default.conf
