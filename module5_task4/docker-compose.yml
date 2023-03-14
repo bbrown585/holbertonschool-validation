@@ -19,7 +19,7 @@ services:
     image: bbrown585/awesome-static:${CURRENT_GIT_REF:-main}
     restart: always
     ports:
-     - 9000
+      - 9000
   reverse-proxy:
     build:
       context: .
