@@ -1,0 +1,3 @@
+FROM jenkins/ssh-agent:latest-jdk11
+
+COPY ./awesome-key.pub /home/jenkins/.ssh/authorized_keys

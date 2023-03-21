@@ -1,0 +1,13 @@
+---
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: tsuroo/jenkins
+    ports:
+      - 80:8080
+    volumes:
+      - jenkins_data:/var/jenkins_home
+volumes:
+  jenkins_data:

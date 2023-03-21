@@ -1,0 +1,19 @@
+---
+unclassified:
+  location:
+    url: http://awesome-website.com
+jenkins:
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "GROUP:Overall/Read:authenticated"
+        - "USER:Overall/Administer:jenkins-admin"
+  securityRealm:
+    local:
+      users:
+        - id: jenkins-admin
+          password: butler
+        - id: devops
+          password: cicdsecret
+  disabledAdministrativeMonitors:
+    - "jenkins.diagnostics.ControllerExecutorsNoAgents"
