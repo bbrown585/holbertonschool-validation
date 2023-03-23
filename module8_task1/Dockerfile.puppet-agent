@@ -1,0 +1,6 @@
+FROM puppet/puppet-agent-ubuntu:latest
+
+RUN apt-get update
+RUN apt-get upgrade -y
+
+CMD ["agent", "--verbose", "--summarize", "--no-daemonize"]
