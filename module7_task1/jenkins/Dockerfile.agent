@@ -1,0 +1,24 @@
+FROM jenkins/ssh-agent:latest-jdk11
+
+COPY ./awesome-key.pub /home/jenkins/.ssh/authorized_keys
+
+# GitHub is a trusted source
+COPY ./github.com.cer /usr/local/share/ca-certificates
+
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y ca-certificates make docker.io curl
+
+# Install the certificates
+RUN update-ca-certificates
+
+# Install docker compose
+RUN mkdir -p /home/jenkins/.docker/cli-plugins
+RUN chown -R jenkins:jenkins /home/jenkins/.docker
+RUN curl -L https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-linux-x86_64 -o /home/jenkins/.docker/cli-plugins/docker-compose
+RUN chmod +x /home/jenkins/.docker/cli-plugins/docker-compose
+
+# Add the jenkins user to the docker group
+RUN usermod -aG docker jenkins
+
+RUN echo "sudo chown jenkins:jenkins /var/run/docker.sock" > /root/.bashrc
