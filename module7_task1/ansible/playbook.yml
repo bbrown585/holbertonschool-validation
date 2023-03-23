@@ -7,6 +7,6 @@
         sudo apt-get install -y docker.io make
     - name: Docker setup
       shell: |
-        sudo systemcall start docker
-        sudo systemcall enabel docker
+        sudo systemctl start docker
+        sudo systemctl enabel docker
         sudo usermod -aG docker ubuntu

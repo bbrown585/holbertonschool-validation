@@ -98,4 +98,7 @@ create-server: # Create a new
 	./ensure-server-created.sh production
 
 ansible-playbook: # Create a new
-	ansible-playbook --inventory=./ansible/inventory.yml ./ansible/playbook.yml
+	ansible-playbook --inventory=./ansible/inventory.yml  ./ansible/playbook.yml
+
+ansible-deploy-jenkins: # Deploy Jenkins
+	ansible-playbook --inventory=./ansible/inventory.yml --tags=deploy-jenkins ./ansible/playbook.yml

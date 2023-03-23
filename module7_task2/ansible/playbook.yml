@@ -1,12 +1,10 @@
-- hosts: prodution jenkins
-  tasks:
-    - name: Update apt cache, upgrade, and install packages
-      shell: |
-        sudo apt-get update
-        sudo apt-get upgrade -y
-        sudo apt-get install -y docker.io make
-    - name: Docker setup
-      shell: |
-        sudo systemcall start docker
-        sudo systemcall enabel docker
-        sudo usermod -aG docker ubuntu
+- hosts: production jenkins
+  tags: server-setup
+  roles:
+    - docker
+- hosts: 127.0.0.1
+  connection: local
+  tags: deploy-jenkins
+  roles:
+    - ci_agent_tools
+    
