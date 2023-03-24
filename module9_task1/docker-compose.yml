@@ -1,0 +1,77 @@
+---
+volumes:
+  puppetserver-code:
+  puppetserver-config:
+  puppetserver-data:
+  puppetdb:
+  puppetdb-postgres:
+  etc-pupetlabs:
+
+services:
+  puppet:
+    hostname: puppet
+    image: puppet/puppetserver:7.2.1
+    ports:
+      - 8140:8140
+    environment:
+      - PUPPETSERVER_HOSTNAME=puppet
+      - CA_ALLOW_SUBJECT_ALT_NAMES=true
+      - DNS_ALT_NAMES=localhost,host.docker.internal,gateway.docker.internal,172.17.0.1
+      - PUPPERWARE_ANALYTICS_ENABLED=false
+      - PUPPETDB_SERVER_URLS=https://puppetdb:8081
+    volumes:
+      - puppetserver-code:/etc/puppetlabs/code/
+      - puppetserver-config:/etc/puppetlabs/puppet/
+      - puppetserver-data:/opt/puppetlabs/server/data/puppetserver/
+
+  postgres:
+    image: postgres:13.3
+    hostname: postgres
+    environment:
+      - POSTGRES_PASSWORD=puppetdb
+      - POSTGRES_USER=puppetdb
+      - POSTGRES_DB=puppetdb
+    healthcheck:
+      test: [ 'CMD-SHELL', "psql --username=puppetdb puppetdb -c ''" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 2m
+    expose:
+      - 5432
+    volumes:
+      - puppetdb-postgres:/var/lib/postgresql/data
+
+  puppetdb:
+    hostname: puppetdb
+    image: puppet/puppetdb:7.5.0
+    environment:
+      - PUPPERWARE_ANALYTICS_ENABLED=false
+      - PUPPETSERVER_HOSTNAME=puppet
+      - PUPPETDB_POSTGRES_HOSTNAME=postgres
+      - PUPPETDB_PASSWORD=puppetdb
+      - PUPPETDB_USER=puppetdb
+      - DNS_ALT_NAMES=localhost,host.docker.internal,gateway.docker.internal,172.17.0.1
+    ports:
+      - 8080
+      - 8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+      puppet:
+        condition: service_healthy
+    volumes:
+      - puppetdb:/opt/puppetlabs/server/data/puppetdb
+
+  node01:
+    hostname: node01
+    image: node01
+    build:
+      context: .
+      dockerfile: Dockerfile.puppet-agent 
+    depends_on:
+      puppet:
+        condition: service_healthy
+    volumes:
+      - etc-pupetlabs:/etc/puppetlabs
+    command: agent --verbose --summerize --no-daemonize 
