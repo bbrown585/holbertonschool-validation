@@ -1,0 +1,17 @@
+---
+# tasks file for ci_agent_tools
+- name: Create and use the jenkins docker context
+  shell: |
+    docker context rm jenkins
+    docker context create jenkins --docker "host=ssh://ubuntu@{{ hostvars['jenkins']['ansible_host'] }}"
+    docker context use jenkins
+- name: Docker compose up
+  shell: |
+    cd ..
+    make build-jenkins
+    cd ./jenkins
+    docker compose up --detach
+- name: Remove the jenkins docker context
+  shell: |
+    docker context use default
+    docker context rm jenkins
