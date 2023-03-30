@@ -45,4 +45,23 @@ resource "aws_instance" "awesome-instance" {
 		Name = each.key
 		Description = each.value
 	}
+	user_data = data.cloudinit_config.server_config.rendered 
+	
+	connection {
+		type 		= "ssh"
+		user		= "ubuntu"
+		private_key	= file("~/.ssh/awesome-key.pem")
+		host 		= self.public_ip
+	}
+}
+
+
+data "cloudinit_config" "server_config" {
+	gzip 		= false
+	base64_encode = true 
+	
+	part {
+		content_type = "text/cloud-config"
+		content = file("./userdata/default.yml")
+	}
 }
